@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>To-Do list</title>
+  </head>
+
+  <body>
+    <div id="myDIV" class="header">
+      <h2 style="margin: 5px">Мой список дел</h2>
+      <input type="text" class="myInput" placeholder="Название..." />
+      <span class="addBtn">Добавить</span>
+    </div>
+    <div role="group" aria-labelledby="id-group-label">
+      <ul class="checkboxes">
+        <li>
+          <div role="checkbox" aria-checked="false" tabindex="0">
+            <p>Чел</p>
+            <div>
+              <span
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="deleteElement"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" /></svg
+              ></span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
