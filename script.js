@@ -148,7 +148,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const todoList = new TodoList();
   container.appendChild(todoList.domNode);
 
-  const button = document.querySelector("#addTodo");
+  const add = document.querySelector("#addTodo");
+  const delSelectedTodo = document.querySelector("#delSelectedTodo");
+  const completeSelectedTodo = document.querySelector("#completeSelectedTodo");
 
-  button.addEventListener("click", () => addNewElement(todoList));
+  add.addEventListener("click", (e) => {
+    e.preventDefault();
+    addNewElement(todoList);
+  });
+  delSelectedTodo.addEventListener("click", (e) => {
+    e.preventDefault();
+  });
+  completeSelectedTodo.addEventListener("click", (e) => {
+    e.preventDefault();
+  });
 });
