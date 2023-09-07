@@ -167,6 +167,7 @@ ul.checkboxes li {
   padding: 0;
 }
 ul.checkboxes li label {
+  font-size: 20px;
   cursor: pointer;
   flex-grow: 1;
   margin: 0;
@@ -192,6 +193,11 @@ ul.checkboxes li div div {
 
 .completedTodo:hover {
   color: green;
+}
+
+[aria-completed="true"] label {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
 [role="checkbox"] {

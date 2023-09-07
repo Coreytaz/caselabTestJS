@@ -64,7 +64,9 @@ class Checkbox {
   createActions(icon, action) {
     const actions = document.createElement("span");
     actions.innerHTML = icon;
-    actions.addEventListener("click", action);
+    actions.addEventListener("click", () => {
+      action(this);
+    });
     this.actions.appendChild(actions);
     this.domNode.append(this.actions);
   }
@@ -108,6 +110,7 @@ class TodoList {
         uniqueId: key,
       });
     });
+    this.sortCompletedTodo();
   }
 
   addNewToDo({
@@ -147,7 +150,7 @@ class TodoList {
       class="completedTodo">
       <polyline points="20 6 9 17 4 12" />
     </svg>`,
-      () => this.completedTodo(uniqueId, checkbox)
+      () => this.completedTodo(uniqueId)
     );
     checkbox.setAttribute("aria-completed", completed);
     const li = document.createElement("li");
@@ -155,7 +158,21 @@ class TodoList {
     this.domNode.appendChild(li);
   }
 
-  // completeSelectedTodo() {}
+  sortCompletedTodo() {
+    this.domNode.childNodes.forEach((node) => {
+      const checkbox = node.firstChild;
+      if (checkbox.getAttribute("aria-completed") === "true") {
+        this.domNode.appendChild(node);
+      }
+    });
+  }
+
+  completeSelectedTodo() {
+    const checkedTodo = this.getCheckedTodo();
+    checkedTodo.forEach((key) => {
+      this.completedTodo(key);
+    });
+  }
 
   deleteSelectedTodo() {
     const checkedTodo = this.getCheckedTodo();
@@ -164,11 +181,13 @@ class TodoList {
     });
   }
 
-  completedTodo(uniqueId, checkbox) {
+  completedTodo(uniqueId) {
     const todoList = this.loadLocalStorage.getLocalStorage();
     const todo = todoList[uniqueId];
     todo.completed = !todo.completed;
-    checkbox.setAttribute("aria-completed", todo.completed);
+    document
+      .getElementById(uniqueId)
+      .parentNode.setAttribute("aria-completed", todo.completed);
     this.loadLocalStorage.setLocalStorage({ ...todo, uniqueId });
   }
 
@@ -209,5 +228,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   });
   completeSelectedTodo.addEventListener("click", (e) => {
     e.preventDefault();
+    todoList.completeSelectedTodo();
+    todoList.sortCompletedTodo();
   });
 });
