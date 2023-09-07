@@ -16,10 +16,10 @@ class LocalStorage {
     }
   }
 
-  setLocalStorage({ text, checked, uniqueId }) {
+  setLocalStorage({ text, checked, uniqueId, completed }) {
     const todoList = this.localStorage.getItem(this.key);
     const list = JSON.parse(todoList);
-    list[uniqueId] = { text, checked };
+    list[uniqueId] = { text, checked, completed };
     this.localStorage.setItem(this.key, JSON.stringify(list));
   }
 
@@ -32,21 +32,22 @@ class LocalStorage {
 }
 
 class Checkbox {
-  constructor(text, value, uniqueId) {
+  constructor(text, value, uniqueId, completed) {
     this.text = text;
     this.value = value;
     this.uniqueId = uniqueId;
+    this.completed = completed;
     this.domNode = document.createElement("div");
     this.label = document.createElement("label");
     this.checkbox = document.createElement("input");
     this.actions = document.createElement("div");
 
-    this.domNode.setAttribute("role", "checkbox");
     this.checkbox.id = uniqueId;
     this.label.setAttribute("for", uniqueId);
     this.checkbox.type = "checkbox";
     this.label.innerHTML = text;
     this.checkbox.checked = value;
+    this.domNode.setAttribute("role", "checkbox");
     this.domNode.setAttribute("aria-checked", value);
 
     this.domNode.appendChild(this.checkbox);
@@ -54,6 +55,10 @@ class Checkbox {
 
     this.label.addEventListener("click", this.toggleCheckbox.bind(this));
     this.loadLocalStorage = new LocalStorage("todoList");
+  }
+
+  setAttribute(name, value) {
+    this.domNode.setAttribute(name, value);
   }
 
   createActions(icon, action) {
@@ -69,6 +74,7 @@ class Checkbox {
       text: this.text,
       checked: !this.checkbox.checked,
       uniqueId: this.uniqueId,
+      completed: this.completed,
     });
     this.domNode.setAttribute("aria-checked", !this.checkbox.checked);
   }
@@ -83,13 +89,22 @@ class TodoList {
     this.loadTodoList();
   }
 
+  getCheckedTodo() {
+    const todoList = this.loadLocalStorage.getLocalStorage();
+    const checkedTodo = Object.keys(todoList).filter(
+      (key) => todoList[key].checked
+    );
+    return checkedTodo;
+  }
+
   loadTodoList() {
     const todoList = this.loadLocalStorage.getLocalStorage();
     Object.keys(todoList).forEach((key) => {
-      const { text, checked } = todoList[key];
+      const { text, checked, completed } = todoList[key];
       this.addNewToDo({
         text,
         checked,
+        completed,
         uniqueId: key,
       });
     });
@@ -98,10 +113,16 @@ class TodoList {
   addNewToDo({
     text,
     checked = false,
+    completed = false,
     uniqueId = "inputLabel_" + Math.random().toString(36).substr(2, 9),
   }) {
-    this.loadLocalStorage.setLocalStorage({ text, checked, uniqueId });
-    const checkbox = new Checkbox(text, checked, uniqueId);
+    this.loadLocalStorage.setLocalStorage({
+      text,
+      checked,
+      uniqueId,
+      completed,
+    });
+    const checkbox = new Checkbox(text, checked, uniqueId, completed);
     checkbox.createActions(
       `<svg
     xmlns="http://www.w3.org/2000/svg"
@@ -120,9 +141,35 @@ class TodoList {
 >`,
       () => this.removeTodo(uniqueId)
     );
+    checkbox.createActions(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="completedTodo">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>`,
+      () => this.completedTodo(uniqueId, checkbox)
+    );
+    checkbox.setAttribute("aria-completed", completed);
     const li = document.createElement("li");
     li.appendChild(checkbox.domNode);
     this.domNode.appendChild(li);
+  }
+
+  // completeSelectedTodo() {}
+
+  deleteSelectedTodo() {
+    const checkedTodo = this.getCheckedTodo();
+    checkedTodo.forEach((key) => {
+      this.removeTodo(key);
+    });
+  }
+
+  completedTodo(uniqueId, checkbox) {
+    const todoList = this.loadLocalStorage.getLocalStorage();
+    const todo = todoList[uniqueId];
+    todo.completed = !todo.completed;
+    checkbox.setAttribute("aria-completed", todo.completed);
+    this.loadLocalStorage.setLocalStorage({ ...todo, uniqueId });
   }
 
   removeTodo(uniqueId) {
@@ -158,6 +205,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   });
   delSelectedTodo.addEventListener("click", (e) => {
     e.preventDefault();
+    todoList.deleteSelectedTodo();
   });
   completeSelectedTodo.addEventListener("click", (e) => {
     e.preventDefault();

@@ -186,6 +186,13 @@ ul.checkboxes li div div {
 .deleteElement:hover {
   color: red;
 }
+.completedTodo {
+  color: black;
+}
+
+.completedTodo:hover {
+  color: green;
+}
 
 [role="checkbox"] {
   width: 100%;
