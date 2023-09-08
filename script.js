@@ -197,6 +197,19 @@ class TodoList {
       document.getElementById(uniqueId).parentNode.parentNode
     );
   }
+
+  deleteLastTodo() {
+    const id = this.domNode.children.item(this.domNode.children.length - 1)
+      .firstChild.firstChild.id;
+
+    this.removeTodo(id);
+  }
+
+  deleteFirstTodo() {
+    const id = this.domNode.children.item(0).firstChild.firstChild.id;
+
+    this.removeTodo(id);
+  }
 }
 
 function addNewElement(todoList) {
@@ -217,6 +230,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const add = document.querySelector("#addTodo");
   const delSelectedTodo = document.querySelector("#delSelectedTodo");
   const completeSelectedTodo = document.querySelector("#completeSelectedTodo");
+  const deleteLastTodo = document.querySelector("#deleteLastTodo");
+  const deleteFirstTodo = document.querySelector("#deleteFirstTodo");
 
   add.addEventListener("click", (e) => {
     e.preventDefault();
@@ -230,5 +245,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
     e.preventDefault();
     todoList.completeSelectedTodo();
     todoList.sortCompletedTodo();
+  });
+  deleteLastTodo.addEventListener("click", (e) => {
+    e.preventDefault();
+    todoList.deleteLastTodo();
+  });
+  deleteFirstTodo.addEventListener("click", (e) => {
+    e.preventDefault();
+    todoList.deleteFirstTodo();
   });
 });
