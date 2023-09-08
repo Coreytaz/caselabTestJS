@@ -126,6 +126,7 @@ class TodoList {
       completed,
     });
     const checkbox = new Checkbox(text, checked, uniqueId, completed);
+    this.toggleCheckbox = checkbox.toggleCheckbox.bind(checkbox);
     checkbox.createActions(
       `<svg
     xmlns="http://www.w3.org/2000/svg"
@@ -159,12 +160,21 @@ class TodoList {
   }
 
   sortCompletedTodo() {
+    const sort = [];
+    this.domNode.childNodes.forEach((node) => {
+      const checkbox = node.firstChild;
+      if (checkbox.getAttribute("aria-completed") === "false") {
+        sort.push(node);
+      }
+    });
     this.domNode.childNodes.forEach((node) => {
       const checkbox = node.firstChild;
       if (checkbox.getAttribute("aria-completed") === "true") {
-        this.domNode.appendChild(node);
+        sort.push(node);
       }
     });
+    this.domNode.append(...sort);
+    sort.length = 0;
   }
 
   completeSelectedTodo() {
@@ -191,7 +201,30 @@ class TodoList {
     this.loadLocalStorage.setLocalStorage({ ...todo, uniqueId });
   }
 
+  selectedEven() {
+    this.domNode.childNodes.forEach((node, key) => {
+      if ((key + 1) % 2 === 0) {
+        node.firstChild.classList.toggle("even");
+      }
+    });
+  }
+  selectedOdd() {
+    this.domNode.childNodes.forEach((node, key) => {
+      if ((key + 1) % 2 !== 0) {
+        node.firstChild.classList.toggle("odd");
+      }
+    });
+  }
+
+  deleteClass() {
+    this.domNode.childNodes.forEach((node) => {
+      node.firstChild.classList.remove("even");
+      node.firstChild.classList.remove("odd");
+    });
+  }
+
   removeTodo(uniqueId) {
+    this.deleteClass();
     this.loadLocalStorage.removeLocalStorage(uniqueId);
     this.domNode.removeChild(
       document.getElementById(uniqueId).parentNode.parentNode
@@ -232,6 +265,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const completeSelectedTodo = document.querySelector("#completeSelectedTodo");
   const deleteLastTodo = document.querySelector("#deleteLastTodo");
   const deleteFirstTodo = document.querySelector("#deleteFirstTodo");
+  const selectedEven = document.querySelector("#selectedEven");
+  const selectedOdd = document.querySelector("#selectedOdd");
 
   add.addEventListener("click", (e) => {
     e.preventDefault();
@@ -253,5 +288,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
   deleteFirstTodo.addEventListener("click", (e) => {
     e.preventDefault();
     todoList.deleteFirstTodo();
+  });
+  selectedEven.addEventListener("click", (e) => {
+    e.preventDefault();
+    todoList.selectedEven();
+  });
+  selectedOdd.addEventListener("click", (e) => {
+    e.preventDefault();
+    todoList.selectedOdd();
   });
 });
