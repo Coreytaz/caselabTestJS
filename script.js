@@ -53,7 +53,15 @@ class Checkbox {
     this.domNode.appendChild(this.checkbox);
     this.domNode.appendChild(this.label);
 
-    this.label.addEventListener("click", this.toggleCheckbox.bind(this));
+    this.checkbox.addEventListener("change", (event) => {
+      this.loadLocalStorage.setLocalStorage({
+        text: this.text,
+        checked: event.currentTarget.checked,
+        uniqueId: this.uniqueId,
+        completed: this.completed,
+      });
+      this.domNode.setAttribute("aria-checked", event.currentTarget.checked);
+    });
     this.loadLocalStorage = new LocalStorage("todoList");
   }
 
@@ -69,16 +77,6 @@ class Checkbox {
     });
     this.actions.appendChild(actions);
     this.domNode.append(this.actions);
-  }
-
-  toggleCheckbox() {
-    this.loadLocalStorage.setLocalStorage({
-      text: this.text,
-      checked: !this.checkbox.checked,
-      uniqueId: this.uniqueId,
-      completed: this.completed,
-    });
-    this.domNode.setAttribute("aria-checked", !this.checkbox.checked);
   }
 }
 
@@ -126,7 +124,6 @@ class TodoList {
       completed,
     });
     const checkbox = new Checkbox(text, checked, uniqueId, completed);
-    this.toggleCheckbox = checkbox.toggleCheckbox.bind(checkbox);
     checkbox.createActions(
       `<svg
     xmlns="http://www.w3.org/2000/svg"
@@ -271,6 +268,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   add.addEventListener("click", (e) => {
     e.preventDefault();
     addNewElement(todoList);
+    todoList.sortCompletedTodo()
   });
   delSelectedTodo.addEventListener("click", (e) => {
     e.preventDefault();
